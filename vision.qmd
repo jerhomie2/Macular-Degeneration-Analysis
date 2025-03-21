@@ -1,0 +1,58 @@
+---
+title: "Macular Degeneration Analysis"
+format: pdf
+editor: visual
+---
+
+```{r setup}
+library(tidyverse)
+library(vroom)
+library(nlme)
+library(multcomp)
+
+armd <- vroom('ARMD.txt')
+```
+
+## EDA
+
+### Violin Plot
+
+It looks like the treatment is effective, but mostly just over longer periods of time.
+
+```{r}
+ggplot(data = armd, aes(x=Vision, y=as.factor(Time), fill=as.factor(Trt))) +
+  geom_violin()
+```
+
+### Line Plot
+
+Vision appears to be worsening much faster without treatment than it is with treatment.
+
+```{r}
+armd %>%
+  mutate(Time = as.factor(Time),
+         Trt = as.factor(Trt)) %>%
+  group_by(Trt, Time) %>%
+  summarize(Vision = mean(Vision)) %>%
+  ggplot(data=., aes(x=Time, y=Vision, color=Trt, group=Trt)) +
+  geom_line()
+```
+
+### Correlation within Subject
+
+```{r}
+ind.lm <- lm(Vision~. -Subject, data=armd)
+ind_resids <- matrix(data=ind.lm$residuals, ncol=4, byrow = TRUE)
+cor(ind_resids)
+```
+
+## Box Regression Model
+
+```{r}
+armd.gls <- gls(Vision~., data=armd,
+               correlation=corSymm(form=~4|Subject))
+
+coef(armd.gls) # beta-hat
+sigma(armd.gls) # sigma-hat
+armd.gls$modelStruct$corStruct #correlation parameters
+```
