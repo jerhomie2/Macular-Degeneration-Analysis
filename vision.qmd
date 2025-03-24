@@ -50,15 +50,6 @@ cor(ind_resids)
 ## Box Regression Model
 
 ```{r}
-armd.gls <- gls(Vision~., data=armd,
-               correlation=corSymm(form=~4|Subject))
-
-coef(armd.gls) # beta-hat
-sigma(armd.gls) # sigma-hat
-armd.gls$modelStruct$corStruct #correlation parameters
-```
-
-```{r}
 armd.gls2 <- gls(Vision ~ Baseline + Time*Trt, data = armd,
                  correlation = corSymm(form = ~4|Subject))
 coef(armd.gls2) # beta-hat
