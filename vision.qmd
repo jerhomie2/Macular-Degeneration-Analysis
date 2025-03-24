@@ -5,6 +5,7 @@ editor: visual
 ---
 
 ```{r setup}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 library(tidyverse)
 library(vroom)
 library(nlme)
@@ -55,4 +56,12 @@ armd.gls <- gls(Vision~., data=armd,
 coef(armd.gls) # beta-hat
 sigma(armd.gls) # sigma-hat
 armd.gls$modelStruct$corStruct #correlation parameters
+```
+
+```{r}
+armd.gls2 <- gls(Vision ~ Baseline + Time*Trt, data = armd,
+                 correlation = corSymm(form = ~4|Subject))
+coef(armd.gls2) # beta-hat
+sigma(armd.gls2) # sigma-hat
+armd.gls2$modelStruct$corStruct #correlation parameters
 ```
