@@ -10,6 +10,7 @@ library(tidyverse)
 library(vroom)
 library(nlme)
 library(multcomp)
+library(car)
 
 armd <- vroom('ARMD.txt')
 ```
@@ -50,9 +51,24 @@ cor(ind_resids)
 ## Box Regression Model
 
 ```{r}
-armd.gls2 <- gls(Vision ~ Baseline + Time*Trt, data = armd,
+armd.gls <- gls(Vision ~ Baseline + Time*Trt, data = armd,
                  correlation = corSymm(form = ~4|Subject))
-coef(armd.gls2) # beta-hat
-sigma(armd.gls2) # sigma-hat
-armd.gls2$modelStruct$corStruct #correlation parameters
+coef(armd.gls) # beta-hat
+sigma(armd.gls) # sigma-hat
+armd.gls$modelStruct$corStruct #correlation parameters
+```
+
+### Validate Model
+
+```{r}
+armd.lm <- lm(Vision ~., data = armd)
+avPlots(armd.lm, terms = ~Baseline+Time, ask = FALSE)
+
+armd$residuals <- residuals(armd.gls, type = 'normalized')
+wide_armd <- armd %>%
+  dplyr::select(Subject, Time, residuals) %>%
+  pivot_wider(names_from = Time, values_from = residuals)
+residual_matrix <- as.matrix(wide_armd[,-1])
+cor_matrix <- cor(residual_matrix)
+cor_matrix
 ```
