@@ -71,4 +71,6 @@ wide_armd <- armd %>%
 residual_matrix <- as.matrix(wide_armd[,-1])
 cor_matrix <- cor(residual_matrix)
 cor_matrix
+
+
 ```
