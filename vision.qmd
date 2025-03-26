@@ -72,5 +72,13 @@ residual_matrix <- as.matrix(wide_armd[,-1])
 cor_matrix <- cor(residual_matrix)
 cor_matrix
 
+armd %>% 
+  ggplot() +
+  geom_histogram(aes(x=residuals, y = after_stat(density))) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1), color = "red")
 
+armd$fitted_values <- fitted(armd.gls)
+armd %>% 
+  ggplot(aes(x = fitted_values, y = residuals)) +
+  geom_point()
 ```
