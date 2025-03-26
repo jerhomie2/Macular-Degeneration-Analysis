@@ -82,3 +82,40 @@ armd %>%
   ggplot(aes(x = fitted_values, y = residuals)) +
   geom_point()
 ```
+
+## Compare Trt to No Trt
+
+```{r}
+summary(armd.gls)
+summary(glht(armd.gls, linfct = matrix(c(0,0,0,1,1),nrow=1), alternative='less'))
+```
+
+## Confidence Intervals
+
+The interaction confidence interval tells us that as time increases, vision of those with the treatment improves.
+
+Vision generally decreases with time.
+
+Treatment alone could lead to increase or decrease in vision scores. Doesn't tell us much by itself.
+
+```{r}
+confint(armd.gls)
+```
+
+## Question 4
+
+average vision at 52 weeks
+
+```{r}
+armd_52weeks <- armd %>%
+  filter(Time == 52)
+armd_52weeks %>%
+  group_by(Trt) %>%
+  summarize(mean_vision = mean(Vision, na.rm = TRUE))
+```
+
+There is a significant difference at 52 weeks
+
+```{r}
+t.test(Vision ~ Trt, data = armd_52weeks)
+```
